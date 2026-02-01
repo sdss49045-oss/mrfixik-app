@@ -1,363 +1,2075 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🔧 MrFixik - Сервис ремонта техники</title>
-    <link rel="icon" href="/favicon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)" />
-    <link rel="icon" href="/favicon-dark.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)" />
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://019c16df-c05d-7578-8749-5677288bd8e3.arena.site/" />
-    <meta property="og:title" content="🔧 MrFixik - Сервис ремонта техники" />
-    <meta
-      property="og:description"
-      content="Check out what I built in Arena's Code Arena - Content is user-generated and unverified"
-    />
-    <meta property="og:image" content="https://screenshot-taker-prod.weichiang.workers.dev/message/019c16df-c05d-7578-8749-5677288bd8e3/og-image.webp" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://019c16df-c05d-7578-8749-5677288bd8e3.arena.site/" />
-    <meta property="twitter:title" content="🔧 MrFixik - Сервис ремонта техники" />
-    <meta
-      property="twitter:description"
-      content="Check out what I built in Arena's Code Arena - Content is user-generated and unverified"
-    />
-    <meta property="twitter:image" content="https://screenshot-taker-prod.weichiang.workers.dev/message/019c16df-c05d-7578-8749-5677288bd8e3/og-image.webp" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
-    <script>
-      const REPORT_SURVEY_ID = "019a46ef-f7dd-0000-58be-14fbb8b91d15";
-      const MESSAGE_ID = "019c16df-c05d-7578-8749-5677288bd8e3";
-      const EVALUATION_SESSION_ID = "019c10aa-fc79-7af1-8b31-9c88ab830315";
-      const getStorageKey = (prefix) => `${prefix}_${MESSAGE_ID}`;
-      const hasStorageKey = (prefix) => !!localStorage.getItem(getStorageKey(prefix));
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MrFixik — Сервис ремонта техники</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-      // snippet below comes from posthog's documentation for running in html pages
-      // prettier-ignore
-      !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-      const POSTHOG_API_KEY = "phc_LG7IJbVJqBsk584rbcKca0D5lV2vHguiijDrVji7yDM";
-      if (POSTHOG_API_KEY) {
-        posthog.init(POSTHOG_API_KEY, {
-          api_host: "/ph",
-          ui_host: "https://us.posthog.com",
-          person_profiles: "identified_only",
-          autocapture: false,
-          disable_session_recording: true,
-          before_send: (event) => {
-            if (event.event === "survey sent") {
-              // On the first survey answer sent, also send the report event
-              if (!hasStorageKey("code_reported")) {
-                localStorage.setItem(getStorageKey("code_reported"), "true");
-                posthog.capture?.("code_preview_banner_report");
-              }
-              // When the survey is completed, hide the report button
-              if (event.properties?.$survey_completed === true) {
-                localStorage.setItem(getStorageKey("survey_completed"), "true");
-                document.querySelector(".report-content-btn").style.display = "none";
-              }
-            }
-            return event;
-          },
-        });
-        posthog.register({ message_id: MESSAGE_ID, evaluation_session_id: EVALUATION_SESSION_ID });
-      }
-    </script>
-    <style>
-      * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    /* Container */
+    .app-container {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+      box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    }
 
-a {
-  text-decoration: none;
-}
+    /* Animated background */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
 
-html,
-body {
-  height: 100%;
-  overflow: hidden;
-}
+    .bg-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      animation: pulse 4s ease-in-out infinite;
+    }
 
-body {
-  font-family:
-    "Inter",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
-  display: flex;
-  flex-direction: column;
-  background: #f5f5f5;
-}
+    .bg-blob-1 {
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: rgba(59, 130, 246, 0.2);
+    }
 
-/* Banner styles */
-.floating-banner {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  animation: slideIn 0.3s ease-out;
-  display: flex;
-  align-items: center;
-  will-change: transform, opacity;
-}
+    .bg-blob-2 {
+      bottom: -100px;
+      left: -100px;
+      width: 300px;
+      height: 300px;
+      background: rgba(139, 92, 246, 0.2);
+      animation-delay: 1s;
+    }
 
-@keyframes slideIn {
-  from {
-    transform: translateY(100px) translateZ(0);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0) translateZ(0);
-    opacity: 1;
-  }
-}
+    .bg-blob-3 {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      height: 400px;
+      background: rgba(99, 102, 241, 0.1);
+      animation-delay: 2s;
+    }
 
-.floating-banner.dismissed {
-  animation: slideOut 0.3s ease-out forwards;
-}
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.1); }
+    }
 
-@keyframes slideOut {
-  to {
-    transform: translateY(100px) translateZ(0);
-    opacity: 0;
-  }
-}
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
 
-.banner-padding {
-  padding: 10px 16px;
-}
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
 
-.banner-link-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  cursor: pointer;
-}
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+      50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+    }
 
-.banner-logo {
-  display: flex;
-  align-items: center;
-  color: #2d2d2d;
-  flex-shrink: 0;
-}
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-.banner-logo svg {
-  height: 28px;
-  width: auto;
-}
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
 
-.banner-text-container {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
 
-.banner-text {
-  margin: 0;
-  white-space: nowrap;
-}
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
 
-.banner-upper-text {
-  color: #151617;
-  font-size: 14px;
-}
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
 
-.banner-lower-text {
-  color: #878c9f;
-  font-size: 10px;
-}
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
 
-.banner-action-container {
-  border-left: 1px solid rgba(45, 47, 53, 0.08);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  align-self: stretch;
-}
+    @keyframes confetti {
+      0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
 
-.action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  color: #999;
-  cursor: pointer;
-  transition: color 0.2s;
-  flex-shrink: 0;
-}
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); }
+    }
 
-.action-btn:hover {
-  color: #2d2d2d;
-}
+    .animate-fadeIn {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
 
-/* Iframe container styles */
-.iframe-container {
-  flex: 1;
-  position: relative;
-  background: white;
-  overflow: hidden;
-  min-height: 0;
-}
+    .animate-fadeInScale {
+      animation: fadeInScale 0.4s ease-out forwards;
+    }
 
-iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
-}
+    .animate-bounce {
+      animation: bounce 2s ease-in-out infinite;
+    }
 
-    </style>
-  </head>
-  <body data-ryu-obtrusive-scrollbars="false">
-    <svg style="display: none">
-      <symbol
-        id="icon-flag"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path
-          d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"
-        />
-      </symbol>
-      <symbol
-        id="icon-close"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M18 6 6 18" />
-        <path d="m6 6 12 12" />
-      </symbol>
-    </svg>
+    .animate-glow {
+      animation: glow 2s ease-in-out infinite;
+    }
 
-    <div class="floating-banner" id="floating-banner">
-      <a
-        href="https://arena.ai/code"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="banner-link-wrapper banner-padding"
-        onclick="onCodePreviewBannerCTAClicked(event)"
-      >
-        <div class="banner-logo"><svg
-  width="167"
-  height="124"
-  viewBox="0 0 167 124"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    d="M57.5364 53.3142C52.1508 53.3142 47.7887 57.6763 47.7887 63.0618V123.88H53.9963V63.0618C53.9963 61.0989 55.5902 59.505 57.5531 59.505C59.5161 59.505 61.11 61.0989 61.11 63.0618V123.88H67.3176V63.0618C67.3176 57.6763 62.9555 53.3142 57.5699 53.3142H57.5364Z"
-    fill="currentColor"
-  />
-  <path
-    d="M109.121 53.3142C103.735 53.3142 99.3734 57.6763 99.3734 63.0618V123.88H105.581V63.0618C105.581 61.0989 107.175 59.505 109.138 59.505C111.101 59.505 112.695 61.0989 112.695 63.0618V123.88H118.902V63.0618C118.902 57.6763 114.54 53.3142 109.155 53.3142H109.121Z"
-    fill="currentColor"
-  />
-  <path
-    d="M83.3286 53.3142C77.9431 53.3142 73.5809 57.6763 73.5809 63.0618V123.88H79.7886V63.0618C79.7886 61.0989 81.3824 59.505 83.3454 59.505C85.3083 59.505 86.9022 61.0989 86.9022 63.0618V123.88H93.1098V63.0618C93.1098 57.6763 88.7477 53.3142 83.3622 53.3142H83.3286Z"
-    fill="currentColor"
-  />
-  <path
-    d="M143.782 28.035L148.077 20.5691H158.06L166.667 0H0L8.60681 20.5691H18.5894L22.8676 28.035C14.5292 30.8872 7.66727 38.135 7.66727 49.0571C7.66727 59.9792 15.5526 69.2235 27.3639 69.2235C29.9477 69.2235 32.3468 68.6867 34.4776 67.7471V123.901H40.6684V62.7978C42.6146 60.1637 43.7555 56.8754 43.8393 53.1508C43.8393 53.1005 43.8561 53.0333 43.8561 52.9662C43.8561 52.9159 43.8393 52.8823 43.8393 52.832C43.8393 52.7985 43.8561 52.7649 43.8561 52.7314C43.8561 52.681 43.8393 52.6307 43.8393 52.5636C43.7722 50.047 43.1011 47.6981 41.9267 45.7016H124.74C123.566 47.6981 122.894 50.047 122.827 52.5636C122.827 52.6307 122.811 52.681 122.811 52.7314V52.9662C122.811 52.9662 122.827 53.1005 122.827 53.1508C122.911 56.8754 124.052 60.1637 125.998 62.7978V123.901H132.189V67.7471C134.32 68.6867 136.702 69.2235 139.303 69.2235C151.097 69.2235 158.999 59.5765 158.999 49.0571C158.999 38.5377 152.121 30.8872 143.782 28.035ZM12.734 14.3615L9.31146 6.20764H157.355L153.933 14.3615H12.734ZM140.93 20.5691L137.491 26.5586H29.1759L25.7365 20.5691H140.93ZM139.303 63.0159C133.246 63.0159 129.085 58.9222 129.018 52.8991C129.052 48.6377 131.803 45.7855 135.796 45.7352H135.914C138.414 45.7352 140.46 47.7988 140.46 49.9631V50.0637C140.41 51.3221 139.403 52.2951 138.145 52.2951C136.434 52.2951 135.041 53.6877 135.041 55.399C135.041 57.1103 136.434 58.5028 138.145 58.5028C142.843 58.5028 146.685 54.6943 146.685 49.9631C146.685 49.8121 146.651 49.6611 146.634 49.5269C146.383 43.9736 141.836 39.5443 135.83 39.5443H83.3166L82.9139 39.5275H82.4945L30.8369 39.5443C24.8305 39.5443 20.2839 43.9736 20.0322 49.5269C20.0154 49.6611 19.9819 49.8121 19.9819 49.9631C19.9819 54.6943 23.8239 58.5028 28.5216 58.5028C30.2329 58.5028 31.6254 57.1103 31.6254 55.399C31.6254 53.6877 30.2329 52.2951 28.5216 52.2951C27.2633 52.2951 26.2566 51.3221 26.1895 50.0637C26.1895 50.0302 26.2063 49.9966 26.2063 49.9631C26.2063 47.7988 28.2364 45.7352 30.753 45.7352H30.8536C34.8634 45.7855 37.6149 48.6377 37.6485 52.8991C37.5814 58.9222 33.4038 63.0159 27.3639 63.0159C19.4114 63.0159 13.8749 56.5902 13.8749 49.0571C13.8749 38.89 21.8442 32.7495 31.6925 32.7495H134.974C144.822 32.7495 152.792 38.89 152.792 49.0571C152.792 56.5902 147.255 63.0159 139.303 63.0159Z"
-    fill="currentColor"
-  />
-</svg>
-</div>
-        <div class="banner-text-container">
-          <p class="banner-text banner-upper-text">Built with Arena</p>
-          <p class="banner-text banner-lower-text">Content is user-generated and unverified</p>
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+      padding: 12px 16px;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-container {
+      position: relative;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    .logo-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 14px;
+      height: 14px;
+      background: #22c55e;
+      border-radius: 50%;
+      border: 2px solid #0f172a;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .header-text h1 {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-text p {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    /* Screen containers */
+    .screen {
+      display: none;
+      position: relative;
+      z-index: 10;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    /* Welcome Screen */
+    .welcome-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .welcome-header {
+      padding: 24px 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .welcome-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .welcome-logo .logo {
+      width: 56px;
+      height: 56px;
+      font-size: 28px;
+    }
+
+    .welcome-logo h1 {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome-logo p {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .welcome-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 16px 32px;
+    }
+
+    .welcome-hero {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .welcome-icon {
+      font-size: 64px;
+      display: inline-block;
+      animation: bounce 2s ease-in-out infinite;
+      margin-bottom: 16px;
+    }
+
+    .welcome-title {
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .welcome-subtitle {
+      font-size: 18px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .welcome-subtitle span {
+      color: #60a5fa;
+      font-weight: 600;
+    }
+
+    /* CTA Button */
+    .cta-button {
+      position: relative;
+      width: 100%;
+      padding: 3px;
+      border-radius: 20px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+      border: none;
+      cursor: pointer;
+      margin-bottom: 32px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    .cta-button:hover {
+      transform: scale(1.02);
+    }
+
+    .cta-button:active {
+      transform: scale(0.98);
+    }
+
+    .cta-button-inner {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 17px;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: background 0.3s;
+    }
+
+    .cta-button:hover .cta-button-inner {
+      background: transparent;
+    }
+
+    .cta-button-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .cta-button-icon {
+      font-size: 24px;
+    }
+
+    .cta-button-arrow {
+      transition: transform 0.3s;
+    }
+
+    .cta-button:hover .cta-button-arrow {
+      transform: translateX(4px);
+    }
+
+    /* Features */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .feature-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s, border-color 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(71, 85, 105, 0.6);
+    }
+
+    .feature-card.blue {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(6, 182, 212, 0.1));
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .feature-card.green {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1));
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+
+    .feature-card.purple {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
+      border-color: rgba(139, 92, 246, 0.3);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(30, 41, 59, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .feature-text h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .feature-text p {
+      font-size: 14px;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(30, 41, 59, 0.3);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s, border-color 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: scale(1.05);
+      border-color: rgba(71, 85, 105, 0.8);
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* Footer */
+    .welcome-footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* Form Screen */
+    .form-screen {
+      padding: 16px;
+      padding-bottom: 100px;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      margin-bottom: 24px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .progress-step {
+      color: #94a3b8;
+    }
+
+    .progress-percent {
+      font-weight: 700;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: rgba(51, 65, 85, 0.5);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+      border-radius: 6px;
+      transition: width 0.5s ease-out;
+      position: relative;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    .step-indicators {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 4px;
+    }
+
+    .step-indicator {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(51, 65, 85, 0.5);
+      color: #64748b;
+      transition: all 0.3s;
+    }
+
+    .step-indicator.active {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: #fff;
+      transform: scale(1.1);
+    }
+
+    .step-indicator.completed {
+      background: linear-gradient(135deg, #22c55e, #10b981);
+      color: #fff;
+    }
+
+    /* Card */
+    .card {
+      background: rgba(30, 41, 59, 0.3);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(10px);
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .card-icon.blue { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2)); }
+    .card-icon.green { background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(6, 182, 212, 0.2)); }
+    .card-icon.orange { background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(239, 68, 68, 0.2)); }
+    .card-icon.yellow { background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(249, 115, 22, 0.2)); }
+    .card-icon.purple { background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2)); }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .card-subtitle {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    /* Device Type Grid */
+    .device-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .device-btn {
+      padding: 16px;
+      border-radius: 16px;
+      border: 2px solid rgba(71, 85, 105, 0.5);
+      background: rgba(30, 41, 59, 0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+
+    .device-btn:hover {
+      border-color: rgba(71, 85, 105, 0.8);
+      transform: scale(1.02);
+    }
+
+    .device-btn.selected {
+      border-color: #3b82f6;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .device-btn-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+      transition: transform 0.3s;
+    }
+
+    .device-btn:hover .device-btn-icon {
+      transform: scale(1.1);
+    }
+
+    .device-btn-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* Input */
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+    }
+
+    .input-label span {
+      color: #64748b;
+      font-weight: 400;
+    }
+
+    .input-label .required {
+      color: #f87171;
+    }
+
+    .input {
+      width: 100%;
+      padding: 16px;
+      border-radius: 16px;
+      border: 2px solid rgba(71, 85, 105, 0.5);
+      background: rgba(30, 41, 59, 0.5);
+      color: #fff;
+      font-size: 16px;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    .input:focus {
+      border-color: #3b82f6;
+      background: rgba(30, 41, 59, 0.8);
+    }
+
+    .input::placeholder {
+      color: #64748b;
+    }
+
+    textarea.input {
+      resize: none;
+      min-height: 120px;
+    }
+
+    /* Dropdown */
+    .dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 8px;
+      background: #1e293b;
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      border-radius: 16px;
+      max-height: 240px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(51, 65, 85, 0.5);
+    }
+
+    .dropdown-item-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Quick problems */
+    .quick-problems {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .quick-problem-label {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .quick-problem-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      background: rgba(51, 65, 85, 0.5);
+      color: #cbd5e1;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .quick-problem-btn:hover {
+      background: rgba(51, 65, 85, 0.8);
+      border-color: rgba(71, 85, 105, 0.8);
+      transform: scale(1.05);
+    }
+
+    /* Urgency options */
+    .urgency-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .urgency-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px;
+      border-radius: 16px;
+      border: 2px solid rgba(71, 85, 105, 0.5);
+      background: rgba(30, 41, 59, 0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .urgency-btn:hover {
+      transform: scale(1.02);
+    }
+
+    .urgency-btn.selected.green {
+      border-color: #22c55e;
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.2));
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+    }
+
+    .urgency-btn.selected.yellow {
+      border-color: #eab308;
+      background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(249, 115, 22, 0.2));
+      box-shadow: 0 0 20px rgba(234, 179, 8, 0.2);
+    }
+
+    .urgency-btn.selected.red {
+      border-color: #ef4444;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(236, 72, 153, 0.2));
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+    }
+
+    .urgency-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .urgency-icon {
+      font-size: 32px;
+    }
+
+    .urgency-label {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .urgency-desc {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .urgency-check {
+      font-size: 28px;
+      animation: fadeInScale 0.3s ease-out;
+    }
+
+    /* Selected preview */
+    .selected-preview {
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(51, 65, 85, 0.3);
+      margin-top: 20px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .selected-preview-label {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+    }
+
+    .selected-preview-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    /* Summary */
+    .summary {
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(51, 65, 85, 0.2);
+      border: 1px solid rgba(71, 85, 105, 0.3);
+      margin-top: 20px;
+    }
+
+    .summary-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .summary-row {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .summary-row span {
+      color: #94a3b8;
+    }
+
+    /* Error */
+    .error-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #f87171;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .error-text span {
+      animation: bounce 1s ease-in-out infinite;
+    }
+
+    /* Navigation buttons */
+    .nav-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .nav-btn {
+      flex: 1;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+    }
+
+    .nav-btn:hover {
+      transform: scale(1.02);
+    }
+
+    .nav-btn:active {
+      transform: scale(0.98);
+    }
+
+    .nav-btn.back {
+      background: rgba(51, 65, 85, 0.5);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      color: #fff;
+    }
+
+    .nav-btn.next {
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+      color: #fff;
+    }
+
+    .nav-btn.submit {
+      background: linear-gradient(90deg, #22c55e, #10b981);
+      color: #fff;
+    }
+
+    .nav-btn.submit:disabled {
+      background: #475569;
+      cursor: wait;
+    }
+
+    .nav-btn-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Success Screen */
+    .success-screen {
+      padding: 16px;
+      padding-bottom: 100px;
+    }
+
+    .success-hero {
+      text-align: center;
+      padding: 32px 0;
+    }
+
+    .success-icon-container {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 24px;
+    }
+
+    .success-glow {
+      position: absolute;
+      inset: 0;
+      background: rgba(34, 197, 94, 0.3);
+      border-radius: 50%;
+      filter: blur(30px);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .success-icon {
+      position: relative;
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4ade80, #10b981);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      box-shadow: 0 20px 40px rgba(34, 197, 94, 0.3);
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .success-title {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #4ade80, #10b981);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .success-subtitle {
+      color: #94a3b8;
+      font-size: 16px;
+    }
+
+    .success-subtitle span {
+      color: #60a5fa;
+      font-weight: 600;
+    }
+
+    /* Data summary */
+    .data-summary {
+      margin-bottom: 16px;
+    }
+
+    .data-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+    }
+
+    .data-row:last-child {
+      border-bottom: none;
+    }
+
+    .data-row-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(51, 65, 85, 0.5), rgba(30, 41, 59, 0.5));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .data-row-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .data-row-label {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .data-row-value {
+      font-size: 16px;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .data-row-subvalue {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    /* Steps */
+    .steps-card {
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.2), rgba(88, 28, 135, 0.2));
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      color: #cbd5e1;
+    }
+
+    /* Contact card */
+    .contact-card {
+      text-align: center;
+    }
+
+    .contact-label {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .contact-value {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-top: 8px;
+    }
+
+    /* Action buttons */
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .action-btn:hover {
+      transform: scale(1.02);
+    }
+
+    .action-btn.secondary {
+      background: rgba(51, 65, 85, 0.5);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      color: #fff;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+      color: #fff;
+    }
+
+    /* Success footer */
+    .success-footer {
+      text-align: center;
+      padding: 24px 0;
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .success-footer span {
+      font-weight: 700;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Confetti */
+    .confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -10px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* Hide scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.5);
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Background -->
+    <div class="bg-animation">
+      <div class="bg-blob bg-blob-1"></div>
+      <div class="bg-blob bg-blob-2"></div>
+      <div class="bg-blob bg-blob-3"></div>
+    </div>
+
+    <div class="particles" id="particles"></div>
+
+    <!-- Welcome Screen -->
+    <div class="screen active" id="welcomeScreen">
+      <div class="welcome-screen">
+        <header class="welcome-header">
+          <div class="welcome-logo">
+            <div class="logo-container">
+              <div class="logo">🔧</div>
+              <div class="logo-badge"></div>
+            </div>
+            <div>
+              <h1>MrFixik</h1>
+              <p>Сервис ремонта техники</p>
+            </div>
+          </div>
+        </header>
+
+        <div class="welcome-content">
+          <div class="welcome-hero animate-fadeIn">
+            <div class="welcome-icon">🔧</div>
+            <h2 class="welcome-title">Добро пожаловать!</h2>
+            <p class="welcome-subtitle">
+              Создайте заявку на ремонт, и я свяжусь с вами <span>в течение 15 минут</span>
+            </p>
+          </div>
+
+          <button class="cta-button" onclick="showForm()">
+            <div class="cta-button-inner">
+              <span class="cta-button-icon">📝</span>
+              <span class="cta-button-text">Создать заявку на ремонт</span>
+              <span class="cta-button-arrow">→</span>
+            </div>
+          </button>
+
+          <div class="features">
+            <div class="feature-card blue animate-fadeIn" style="animation-delay: 0.1s">
+              <div class="feature-icon">🚀</div>
+              <div class="feature-text">
+                <h3>Быстро</h3>
+                <p>Свяжусь с вами в течение 15 минут после создания заявки</p>
+              </div>
+            </div>
+            <div class="feature-card green animate-fadeIn" style="animation-delay: 0.2s">
+              <div class="feature-icon" style="animation-delay: 0.3s">🛡️</div>
+              <div class="feature-text">
+                <h3>Опыт с 2007</h3>
+                <p>18 лет в ремонте техники. Паяю с детства, знаю технику изнутри</p>
+              </div>
+            </div>
+            <div class="feature-card purple animate-fadeIn" style="animation-delay: 0.3s">
+              <div class="feature-icon" style="animation-delay: 0.5s">💎</div>
+              <div class="feature-text">
+                <h3>Гарантия</h3>
+                <p>Гарантия на все виды работ от 14 до 90 дней</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="stats animate-fadeIn" style="animation-delay: 0.4s">
+            <div class="stat-card">
+              <div class="stat-value">5000+</div>
+              <div class="stat-label">Ремонтов</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">18 лет</div>
+              <div class="stat-label">Опыта</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">24/7</div>
+              <div class="stat-label">На связи</div>
+            </div>
+          </div>
         </div>
-      </a>
-      <div class="banner-action-container banner-padding">
-        <button
-          class="action-btn report-content-btn"
-          style="display: none"
-          onclick="reportContent(event)"
-          aria-label="Report content"
-        >
-          <svg class="report-icon" width="20" height="20"><use href="#icon-flag" /></svg>
-        </button>
-        <button class="action-btn" onclick="dismissBanner(event)" aria-label="Close banner">
-          <svg width="20" height="20"><use href="#icon-close" /></svg>
-        </button>
+
+        <footer class="welcome-footer">
+          💜 Работаем для вас с любовью
+        </footer>
       </div>
     </div>
 
-    <div class="iframe-container">
-      <iframe
-        id="preview-iframe"
-        src="https://019c16df-c05d-7578-8749-5677288bd8e3.arena.site/?embed=true"
-        sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-presentation allow-popups allow-popups-to-escape-sandbox allow-downloads allow-top-navigation-by-user-activation"
-        allow="accelerometer; autoplay; camera; encrypted-media; fullscreen; geolocation; gyroscope; microphone; midi; clipboard-read; clipboard-write; usb; vr; xr-spatial-tracking; screen-wake-lock; magnetometer; ambient-light-sensor; battery; gamepad; picture-in-picture; display-capture; bluetooth"
-        referrerpolicy="origin-when-cross-origin"
-      ></iframe>
+    <!-- Form Screen -->
+    <div class="screen" id="formScreen">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-content">
+          <div class="logo-container">
+            <div class="logo">🔧</div>
+            <div class="logo-badge"></div>
+          </div>
+          <div class="header-text">
+            <h1>MrFixik</h1>
+            <p>Профессиональный ремонт техники</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-screen">
+        <!-- Progress -->
+        <div class="progress-container">
+          <div class="progress-header">
+            <span class="progress-step">Шаг <span id="currentStep">1</span> из 5</span>
+            <span class="progress-percent"><span id="progressPercent">20</span>%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+          </div>
+          <div class="step-indicators">
+            <div class="step-indicator active" id="stepInd1">1</div>
+            <div class="step-indicator" id="stepInd2">2</div>
+            <div class="step-indicator" id="stepInd3">3</div>
+            <div class="step-indicator" id="stepInd4">4</div>
+            <div class="step-indicator" id="stepInd5">5</div>
+          </div>
+        </div>
+
+        <!-- Step 1: Device Type -->
+        <div class="form-step" id="step1">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon blue">💻</div>
+              <div>
+                <h2 class="card-title">Тип техники</h2>
+                <p class="card-subtitle">Что нужно отремонтировать?</p>
+              </div>
+            </div>
+            <div class="device-grid" id="deviceGrid"></div>
+            <div class="error-text" id="error1" style="display: none">
+              <span>⚠️</span> Выберите тип техники
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Brand & Model -->
+        <div class="form-step" id="step2" style="display: none">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon green" id="step2Icon">📱</div>
+              <div>
+                <h2 class="card-title">Модель устройства</h2>
+                <p class="card-subtitle">Укажите бренд и модель</p>
+              </div>
+            </div>
+            
+            <div class="input-group">
+              <label class="input-label">🏷️ Бренд</label>
+              <input type="text" class="input" id="brandInput" placeholder="Начните вводить бренд..." autocomplete="off">
+              <div class="dropdown" id="brandDropdown" style="display: none"></div>
+              <div class="error-text" id="error2" style="display: none">
+                <span>⚠️</span> Укажите бренд
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">📱 Модель <span>(опционально)</span></label>
+              <input type="text" class="input" id="modelInput" placeholder="Введите модель устройства..." autocomplete="off">
+              <div class="dropdown" id="modelDropdown" style="display: none"></div>
+            </div>
+
+            <div class="selected-preview" id="selectedPreview" style="display: none">
+              <p class="selected-preview-label">Выбрано устройство:</p>
+              <p class="selected-preview-value" id="previewText"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Problem -->
+        <div class="form-step" id="step3" style="display: none">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon orange">⚠️</div>
+              <div>
+                <h2 class="card-title">Описание проблемы</h2>
+                <p class="card-subtitle">Что случилось с устройством?</p>
+              </div>
+            </div>
+
+            <textarea class="input" id="problemInput" placeholder="Опишите проблему подробно. Например: экран мигает, батарея быстро разряжается, не работает кнопка..."></textarea>
+            <div class="error-text" id="error3" style="display: none">
+              <span>⚠️</span> Опишите проблему
+            </div>
+
+            <div class="quick-problems">
+              <span class="quick-problem-label">💡 Быстрый выбор:</span>
+              <div id="quickProblemsContainer"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Urgency -->
+        <div class="form-step" id="step4" style="display: none">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon yellow">⏰</div>
+              <div>
+                <h2 class="card-title">Срочность ремонта</h2>
+                <p class="card-subtitle">Как быстро нужен ремонт?</p>
+              </div>
+            </div>
+
+            <div class="urgency-options" id="urgencyOptions"></div>
+            <div class="error-text" id="error4" style="display: none">
+              <span>⚠️</span> Выберите срочность
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Contact -->
+        <div class="form-step" id="step5" style="display: none">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon purple">📞</div>
+              <div>
+                <h2 class="card-title">Контактные данные</h2>
+                <p class="card-subtitle">Как с вами связаться?</p>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">📍 Адрес <span>(опционально)</span></label>
+              <input type="text" class="input" id="addressInput" placeholder="Для выезда мастера или самовывоза">
+            </div>
+
+            <div class="input-group">
+              <label class="input-label">📱 Контактный телефон <span class="required">*</span></label>
+              <input type="tel" class="input" id="phoneInput" placeholder="+7 (999) 123-45-67">
+              <div class="error-text" id="error5" style="display: none">
+                <span>⚠️</span> Укажите номер телефона
+              </div>
+            </div>
+
+            <div class="summary">
+              <h3 class="summary-title"><span>📋</span> Проверьте данные:</h3>
+              <div id="summaryContent"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-buttons">
+          <button class="nav-btn back" id="backBtn" onclick="prevStep()" style="display: none">← Назад</button>
+          <button class="nav-btn next" id="nextBtn" onclick="nextStep()">Далее →</button>
+          <button class="nav-btn submit" id="submitBtn" onclick="submitForm()" style="display: none">
+            <span class="nav-btn-content">
+              <span>📤</span> Отправить заявку
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <script>
-      const iframe = document.getElementById("preview-iframe");
-      iframe.addEventListener("load", () => iframe.focus());
+    <!-- Success Screen -->
+    <div class="screen" id="successScreen">
+      <div class="header">
+        <div class="header-content">
+          <div class="logo-container">
+            <div class="logo">🔧</div>
+            <div class="logo-badge"></div>
+          </div>
+          <div class="header-text">
+            <h1>MrFixik</h1>
+            <p>Профессиональный ремонт техники</p>
+          </div>
+        </div>
+      </div>
 
-      document.addEventListener("DOMContentLoaded", () => {
-        if (!hasStorageKey("code_reported") || !hasStorageKey("survey_completed")) {
-          document.querySelector(".report-content-btn").style.display = "block";
+      <div class="success-screen">
+        <div class="confetti-container" id="confettiContainer"></div>
+
+        <div class="success-hero animate-fadeIn">
+          <div class="success-icon-container">
+            <div class="success-glow"></div>
+            <div class="success-icon">✅</div>
+          </div>
+          <h1 class="success-title">Заявка отправлена!</h1>
+          <p class="success-subtitle">Мы свяжемся с вами <span>в течение 15 минут</span></p>
+        </div>
+
+        <div class="card data-summary animate-fadeIn" style="animation-delay: 0.2s">
+          <div class="card-header">
+            <div class="card-icon blue" style="width: 40px; height: 40px; font-size: 20px;">📋</div>
+            <h2 class="card-title" style="font-size: 18px;">Данные заявки</h2>
+          </div>
+          <div id="successSummary"></div>
+        </div>
+
+        <div class="card steps-card animate-fadeIn" style="animation-delay: 0.3s">
+          <div class="card-header">
+            <div class="card-icon purple" style="width: 40px; height: 40px; font-size: 20px;">🚀</div>
+            <h2 class="card-title" style="font-size: 18px;">Что дальше?</h2>
+          </div>
+          <div class="steps-list">
+            <div class="step-item">
+              <div class="step-number">1</div>
+              <span class="step-text">👀 Мастер изучит вашу заявку</span>
+            </div>
+            <div class="step-item">
+              <div class="step-number">2</div>
+              <span class="step-text">📞 Свяжемся для уточнения деталей</span>
+            </div>
+            <div class="step-item">
+              <div class="step-number">3</div>
+              <span class="step-text">🔧 Диагностика и ремонт устройства</span>
+            </div>
+            <div class="step-item">
+              <div class="step-number">4</div>
+              <span class="step-text">🎉 Возврат исправного устройства</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card contact-card animate-fadeIn" style="animation-delay: 0.4s">
+          <p class="contact-label">Есть вопросы? Напишите нам:</p>
+          <p class="contact-value">@MrFixik_support</p>
+        </div>
+
+        <div class="action-buttons animate-fadeIn" style="animation-delay: 0.5s">
+          <button class="action-btn secondary" onclick="newRequest()">➕ Создать ещё заявку</button>
+          <button class="action-btn primary" onclick="closeApp()" id="closeBtn" style="display: none">✓ Закрыть</button>
+        </div>
+
+        <div class="success-footer animate-fadeIn" style="animation-delay: 0.6s">
+          Спасибо, что выбрали <span>MrFixik</span> 💜
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Telegram WebApp
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    // Data
+    const deviceTypes = [
+      { id: 'smartphone', icon: '📱', label: 'Смартфон' },
+      { id: 'laptop', icon: '💻', label: 'Ноутбук' },
+      { id: 'computer', icon: '🖥️', label: 'Компьютер' },
+      { id: 'tv', icon: '📺', label: 'Телевизор' },
+      { id: 'audio', icon: '🔊', label: 'Аудиотехника' },
+      { id: 'appliance', icon: '🏠', label: 'Бытовая техника' },
+      { id: 'other', icon: '🔌', label: 'Другое' }
+    ];
+
+    const brandsByCategory = {
+      smartphone: ['Apple iPhone', 'Samsung', 'Xiaomi', 'Huawei', 'Honor', 'OPPO', 'Vivo', 'Realme', 'OnePlus', 'Google Pixel', 'Sony', 'Nokia', 'Motorola', 'ASUS ROG Phone', 'Poco', 'Redmi', 'Nothing', 'Meizu', 'ZTE', 'Lenovo'],
+      laptop: ['Apple MacBook', 'ASUS', 'Lenovo', 'HP', 'Dell', 'Acer', 'MSI', 'Razer', 'Microsoft Surface', 'Huawei MateBook', 'Samsung', 'LG Gram', 'Xiaomi Mi Notebook', 'Honor MagicBook', 'GIGABYTE', 'Alienware', 'Toshiba'],
+      computer: ['Собранный ПК', 'Apple iMac', 'Apple Mac Mini', 'Apple Mac Pro', 'HP', 'Dell', 'Lenovo', 'ASUS', 'Acer', 'MSI', 'Intel NUC', 'GIGABYTE'],
+      tv: ['Samsung', 'LG', 'Sony', 'Philips', 'TCL', 'Hisense', 'Xiaomi Mi TV', 'Panasonic', 'Sharp', 'Toshiba', 'Haier', 'BBK', 'Hyundai', 'Dexp', 'Thomson', 'JVC', 'Polarline', 'Supra', 'KIVI'],
+      audio: ['Sony', 'JBL', 'Bose', 'Harman Kardon', 'Marshall', 'Bang & Olufsen', 'Apple HomePod', 'Sonos', 'Yamaha', 'Denon', 'Pioneer', 'Samsung', 'LG', 'Xiaomi', 'Edifier', 'Audio-Technica', 'Sennheiser', 'Beats'],
+      appliance: ['Samsung', 'LG', 'Bosch', 'Siemens', 'Electrolux', 'Whirlpool', 'Indesit', 'Beko', 'Haier', 'Xiaomi', 'Gorenje', 'Candy', 'Hotpoint-Ariston', 'Miele', 'Zanussi', 'Hansa', 'Midea', 'Philips', 'Dyson', 'iRobot'],
+      other: ['Другой бренд']
+    };
+
+    const modelsByBrand = {
+      'Apple iPhone': ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14', 'iPhone 13', 'iPhone 12', 'iPhone 11', 'iPhone SE'],
+      'Samsung': ['Galaxy S24 Ultra', 'Galaxy S24+', 'Galaxy S24', 'Galaxy S23', 'Galaxy Z Fold5', 'Galaxy Z Flip5', 'Galaxy A54', 'Galaxy A34', 'Galaxy A14'],
+      'Xiaomi': ['14 Ultra', '14 Pro', '14', '13T Pro', '13T', 'Redmi Note 13 Pro', 'Redmi Note 13', 'Redmi 13C', 'Poco X6 Pro', 'Poco F5'],
+      'Apple MacBook': ['MacBook Pro 16" M3 Max', 'MacBook Pro 14" M3 Pro', 'MacBook Pro 14" M3', 'MacBook Air 15" M3', 'MacBook Air 13" M3', 'MacBook Air M2', 'MacBook Pro M2'],
+      'ASUS': ['ROG Zephyrus', 'TUF Gaming', 'ZenBook Pro', 'ZenBook 14', 'VivoBook', 'ProArt StudioBook', 'ExpertBook'],
+      'Lenovo': ['ThinkPad X1 Carbon', 'ThinkPad T14', 'IdeaPad 5', 'Legion 5 Pro', 'Legion 7', 'Yoga 9i', 'LOQ'],
+      'Sony': ['Bravia XR A95L', 'Bravia XR X95L', 'Bravia XR A80L', 'Bravia X85L', 'WH-1000XM5', 'WF-1000XM5', 'PlayStation 5'],
+      'LG': ['OLED C3', 'OLED G3', 'QNED Mini LED', 'NanoCell', 'UHD 4K', 'Gram 17', 'Gram 16']
+    };
+
+    const quickProblems = [
+      { icon: '🔌', text: 'Не включается' },
+      { icon: '🔋', text: 'Не заряжается' },
+      { icon: '📱', text: 'Разбит экран' },
+      { icon: '🔊', text: 'Не работает звук' },
+      { icon: '📶', text: 'Нет сети' },
+      { icon: '💧', text: 'Попала вода' },
+      { icon: '🔥', text: 'Перегревается' },
+      { icon: '⚡', text: 'Зависает' }
+    ];
+
+    const urgencyOptions = [
+      { id: 'not_urgent', label: 'Не срочно', desc: 'В течение недели', icon: '🟢', color: 'green' },
+      { id: '1_3_days', label: '1-3 дня', desc: 'Средняя срочность', icon: '🟡', color: 'yellow' },
+      { id: 'urgent', label: 'Очень срочно', desc: 'Как можно скорее', icon: '🔴', color: 'red' }
+    ];
+
+    // State
+    let currentStep = 1;
+    let formData = {
+      deviceType: '',
+      deviceTypeLabel: '',
+      deviceIcon: '',
+      brand: '',
+      model: '',
+      problem: '',
+      urgency: '',
+      urgencyLabel: '',
+      address: '',
+      phone: ''
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      createParticles();
+      renderDeviceGrid();
+      renderQuickProblems();
+      renderUrgencyOptions();
+      setupInputListeners();
+      
+      if (tg) {
+        document.getElementById('closeBtn').style.display = 'block';
+      }
+    });
+
+    function createParticles() {
+      const container = document.getElementById('particles');
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 4 + 's';
+        particle.style.animationDuration = (3 + Math.random() * 3) + 's';
+        container.appendChild(particle);
+      }
+    }
+
+    function renderDeviceGrid() {
+      const grid = document.getElementById('deviceGrid');
+      grid.innerHTML = deviceTypes.map((device, i) => `
+        <button class="device-btn" onclick="selectDevice('${device.id}', '${device.label}', '${device.icon}')" id="device_${device.id}" style="animation: fadeIn 0.5s ease-out ${i * 0.05}s forwards; opacity: 0;">
+          <div class="device-btn-icon">${device.icon}</div>
+          <div class="device-btn-label">${device.label}</div>
+        </button>
+      `).join('');
+    }
+
+    function renderQuickProblems() {
+      const container = document.getElementById('quickProblemsContainer');
+      container.innerHTML = quickProblems.map((p, i) => `
+        <button class="quick-problem-btn" onclick="addQuickProblem('${p.text}')" style="animation: fadeIn 0.3s ease-out ${i * 0.05}s forwards; opacity: 0;">
+          ${p.icon} ${p.text}
+        </button>
+      `).join('');
+    }
+
+    function renderUrgencyOptions() {
+      const container = document.getElementById('urgencyOptions');
+      container.innerHTML = urgencyOptions.map((opt, i) => `
+        <button class="urgency-btn" onclick="selectUrgency('${opt.id}', '${opt.label}', '${opt.color}')" id="urgency_${opt.id}" style="animation: fadeIn 0.5s ease-out ${i * 0.1}s forwards; opacity: 0;">
+          <div class="urgency-left">
+            <span class="urgency-icon">${opt.icon}</span>
+            <div>
+              <div class="urgency-label">${opt.label}</div>
+              <div class="urgency-desc">${opt.desc}</div>
+            </div>
+          </div>
+          <span class="urgency-check" id="urgencyCheck_${opt.id}" style="display: none;">✓</span>
+        </button>
+      `).join('');
+    }
+
+    function setupInputListeners() {
+      const brandInput = document.getElementById('brandInput');
+      const modelInput = document.getElementById('modelInput');
+      
+      brandInput.addEventListener('input', (e) => {
+        formData.brand = e.target.value;
+        showBrandDropdown(e.target.value);
+        updatePreview();
+      });
+      
+      brandInput.addEventListener('focus', () => {
+        showBrandDropdown(brandInput.value);
+      });
+
+      modelInput.addEventListener('input', (e) => {
+        formData.model = e.target.value;
+        showModelDropdown(e.target.value);
+        updatePreview();
+      });
+      
+      modelInput.addEventListener('focus', () => {
+        showModelDropdown(modelInput.value);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.input-group')) {
+          document.getElementById('brandDropdown').style.display = 'none';
+          document.getElementById('modelDropdown').style.display = 'none';
         }
       });
 
-      function onCodePreviewBannerCTAClicked(event) {
-        posthog?.capture?.("code_preview_banner_cta_clicked");
+      document.getElementById('problemInput').addEventListener('input', (e) => {
+        formData.problem = e.target.value;
+      });
+
+      document.getElementById('addressInput').addEventListener('input', (e) => {
+        formData.address = e.target.value;
+      });
+
+      document.getElementById('phoneInput').addEventListener('input', (e) => {
+        formData.phone = e.target.value;
+      });
+    }
+
+    function showBrandDropdown(search) {
+      const brands = brandsByCategory[formData.deviceType] || [];
+      const filtered = brands.filter(b => b.toLowerCase().includes(search.toLowerCase()));
+      const dropdown = document.getElementById('brandDropdown');
+      
+      if (filtered.length > 0 && search.length >= 0) {
+        dropdown.innerHTML = filtered.slice(0, 8).map(brand => `
+          <div class="dropdown-item" onclick="selectBrand('${brand}')">
+            <div class="dropdown-item-icon">${brand.charAt(0)}</div>
+            <span>${brand}</span>
+          </div>
+        `).join('');
+        dropdown.style.display = 'block';
+      } else {
+        dropdown.style.display = 'none';
       }
+    }
 
-      function reportContent(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        if (!posthog || !posthog.capture || !posthog.setPersonProperties || !posthog.displaySurvey) return;
+    function showModelDropdown(search) {
+      const models = modelsByBrand[formData.brand] || [];
+      const filtered = models.filter(m => m.toLowerCase().includes(search.toLowerCase()));
+      const dropdown = document.getElementById('modelDropdown');
+      
+      if (filtered.length > 0) {
+        dropdown.innerHTML = filtered.map(model => `
+          <div class="dropdown-item" onclick="selectModel('${model}')">
+            <span style="color: #60a5fa;">•</span>
+            <span>${model}</span>
+          </div>
+        `).join('');
+        dropdown.style.display = 'block';
+      } else {
+        dropdown.style.display = 'none';
+      }
+    }
 
-        if (!hasStorageKey("survey_completed")) {
-          posthog.setPersonProperties?.({
-            last_reported_message_id: MESSAGE_ID,
-            last_report_timestamp: Date.now(),
-          });
-          posthog.displaySurvey?.(REPORT_SURVEY_ID, {
-            ignoreConditions: true,
-            ignoreDelay: true,
-          });
+    function selectBrand(brand) {
+      formData.brand = brand;
+      formData.model = '';
+      document.getElementById('brandInput').value = brand;
+      document.getElementById('modelInput').value = '';
+      document.getElementById('brandDropdown').style.display = 'none';
+      updatePreview();
+    }
+
+    function selectModel(model) {
+      formData.model = model;
+      document.getElementById('modelInput').value = model;
+      document.getElementById('modelDropdown').style.display = 'none';
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const preview = document.getElementById('selectedPreview');
+      const text = document.getElementById('previewText');
+      
+      if (formData.brand) {
+        preview.style.display = 'block';
+        text.textContent = `${formData.deviceIcon} ${formData.brand} ${formData.model}`;
+      } else {
+        preview.style.display = 'none';
+      }
+    }
+
+    function selectDevice(id, label, icon) {
+      formData.deviceType = id;
+      formData.deviceTypeLabel = label;
+      formData.deviceIcon = icon;
+      formData.brand = '';
+      formData.model = '';
+      
+      document.querySelectorAll('.device-btn').forEach(btn => btn.classList.remove('selected'));
+      document.getElementById('device_' + id).classList.add('selected');
+      document.getElementById('error1').style.display = 'none';
+      
+      document.getElementById('step2Icon').textContent = icon;
+    }
+
+    function addQuickProblem(text) {
+      const input = document.getElementById('problemInput');
+      const current = input.value;
+      input.value = current ? current + ', ' + text.toLowerCase() : text;
+      formData.problem = input.value;
+      document.getElementById('error3').style.display = 'none';
+    }
+
+    function selectUrgency(id, label, color) {
+      formData.urgency = id;
+      formData.urgencyLabel = label;
+      
+      document.querySelectorAll('.urgency-btn').forEach(btn => {
+        btn.classList.remove('selected', 'green', 'yellow', 'red');
+      });
+      document.querySelectorAll('.urgency-check').forEach(check => {
+        check.style.display = 'none';
+      });
+      
+      const btn = document.getElementById('urgency_' + id);
+      btn.classList.add('selected', color);
+      document.getElementById('urgencyCheck_' + id).style.display = 'block';
+      document.getElementById('error4').style.display = 'none';
+    }
+
+    function showForm() {
+      document.getElementById('welcomeScreen').classList.remove('active');
+      document.getElementById('formScreen').classList.add('active');
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function updateProgress() {
+      const percent = (currentStep / 5) * 100;
+      document.getElementById('currentStep').textContent = currentStep;
+      document.getElementById('progressPercent').textContent = Math.round(percent);
+      document.getElementById('progressFill').style.width = percent + '%';
+      
+      for (let i = 1; i <= 5; i++) {
+        const ind = document.getElementById('stepInd' + i);
+        ind.classList.remove('active', 'completed');
+        if (i < currentStep) {
+          ind.classList.add('completed');
+          ind.textContent = '✓';
+        } else if (i === currentStep) {
+          ind.classList.add('active');
+          ind.textContent = i;
+        } else {
+          ind.textContent = i;
         }
       }
+    }
 
-      function dismissBanner(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        posthog?.capture?.("code_preview_banner_dismiss");
-
-        const banner = document.getElementById("floating-banner");
-        banner.classList.add("dismissed");
-        setTimeout(() => banner.remove(), 300);
+    function showStep(step) {
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById('step' + i).style.display = i === step ? 'block' : 'none';
       }
-    </script>
-  </body>
+      
+      document.getElementById('backBtn').style.display = step > 1 ? 'block' : 'none';
+      document.getElementById('nextBtn').style.display = step < 5 ? 'block' : 'none';
+      document.getElementById('submitBtn').style.display = step === 5 ? 'block' : 'none';
+      
+      if (step === 5) {
+        updateSummary();
+      }
+    }
+
+    function updateSummary() {
+      const container = document.getElementById('summaryContent');
+      container.innerHTML = `
+        <p class="summary-row"><span>Устройство:</span> ${formData.deviceTypeLabel}</p>
+        <p class="summary-row"><span>Модель:</span> ${formData.brand} ${formData.model}</p>
+        <p class="summary-row"><span>Проблема:</span> ${formData.problem.slice(0, 50)}...</p>
+        <p class="summary-row"><span>Срочность:</span> ${formData.urgencyLabel}</p>
+      `;
+    }
+
+    function validateStep() {
+      let valid = true;
+      
+      if (currentStep === 1 && !formData.deviceType) {
+        document.getElementById('error1').style.display = 'flex';
+        valid = false;
+      }
+      
+      if (currentStep === 2 && !formData.brand.trim()) {
+        document.getElementById('error2').style.display = 'flex';
+        valid = false;
+      }
+      
+      if (currentStep === 3 && !formData.problem.trim()) {
+        document.getElementById('error3').style.display = 'flex';
+        valid = false;
+      }
+      
+      if (currentStep === 4 && !formData.urgency) {
+        document.getElementById('error4').style.display = 'flex';
+        valid = false;
+      }
+      
+      if (currentStep === 5 && !formData.phone.trim()) {
+        document.getElementById('error5').style.display = 'flex';
+        valid = false;
+      }
+      
+      return valid;
+    }
+
+    function nextStep() {
+      if (!validateStep()) return;
+      
+      currentStep++;
+      updateProgress();
+      showStep(currentStep);
+    }
+
+    function prevStep() {
+      currentStep--;
+      updateProgress();
+      showStep(currentStep);
+    }
+
+    function submitForm() {
+      if (!validateStep()) return;
+      
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="nav-btn-content"><span class="spinner"></span> Отправка...</span>';
+      
+      setTimeout(() => {
+        // Send to Telegram
+        if (tg) {
+          const data = {
+            deviceType: formData.deviceTypeLabel,
+            brand: formData.brand,
+            model: formData.model,
+            problem: formData.problem,
+            urgency: formData.urgencyLabel,
+            address: formData.address,
+            phone: formData.phone
+          };
+          tg.sendData(JSON.stringify(data));
+        }
+        
+        showSuccessScreen();
+      }, 1500);
+    }
+
+    function showSuccessScreen() {
+      showScreen('successScreen');
+      createConfetti();
+      renderSuccessSummary();
+    }
+
+    function renderSuccessSummary() {
+      const container = document.getElementById('successSummary');
+      const items = [
+        { icon: '💻', label: 'Устройство', value: formData.deviceTypeLabel, subvalue: `${formData.brand} ${formData.model}` },
+        { icon: '⚠️', label: 'Проблема', value: formData.problem },
+        { icon: '⏰', label: 'Срочность', value: formData.urgencyLabel },
+        { icon: '📱', label: 'Телефон', value: formData.phone }
+      ];
+      
+      if (formData.address) {
+        items.push({ icon: '📍', label: 'Адрес', value: formData.address });
+      }
+      
+      container.innerHTML = items.map((item, i) => `
+        <div class="data-row" style="animation: slideInRight 0.5s ease-out ${0.3 + i * 0.1}s forwards; opacity: 0;">
+          <div class="data-row-icon">${item.icon}</div>
+          <div class="data-row-content">
+            <div class="data-row-label">${item.label}</div>
+            <div class="data-row-value">${item.value}</div>
+            ${item.subvalue ? `<div class="data-row-subvalue">${item.subvalue}</div>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function createConfetti() {
+      const container = document.getElementById('confettiContainer');
+      const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#22c55e', '#f59e0b'];
+      
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animation = `confetti 1.5s ease-out ${Math.random() * 0.5}s forwards`;
+        container.appendChild(confetti);
+      }
+      
+      setTimeout(() => {
+        container.innerHTML = '';
+      }, 2000);
+    }
+
+    function newRequest() {
+      currentStep = 1;
+      formData = {
+        deviceType: '',
+        deviceTypeLabel: '',
+        deviceIcon: '',
+        brand: '',
+        model: '',
+        problem: '',
+        urgency: '',
+        urgencyLabel: '',
+        address: '',
+        phone: ''
+      };
+      
+      // Reset form
+      document.querySelectorAll('.device-btn').forEach(btn => btn.classList.remove('selected'));
+      document.querySelectorAll('.urgency-btn').forEach(btn => {
+        btn.classList.remove('selected', 'green', 'yellow', 'red');
+      });
+      document.querySelectorAll('.urgency-check').forEach(check => {
+        check.style.display = 'none';
+      });
+      document.getElementById('brandInput').value = '';
+      document.getElementById('modelInput').value = '';
+      document.getElementById('problemInput').value = '';
+      document.getElementById('addressInput').value = '';
+      document.getElementById('phoneInput').value = '';
+      document.getElementById('selectedPreview').style.display = 'none';
+      
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span class="nav-btn-content"><span>📤</span> Отправить заявку</span>';
+      
+      updateProgress();
+      showStep(1);
+      showScreen('formScreen');
+    }
+
+    function closeApp() {
+      if (tg) {
+        tg.close();
+      }
+    }
+  </script>
+</body>
 </html>
