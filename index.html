@@ -1556,7 +1556,7 @@
 
         <div class="card contact-card animate-fadeIn" style="animation-delay: 0.4s">
           <p class="contact-label">Есть вопросы? Напишите нам:</p>
-          <p class="contact-value">@MrFixik_support</p>
+          <p class="contact-value">@mrFixik</p>
         </div>
 
         <div class="action-buttons animate-fadeIn" style="animation-delay: 0.5s">
@@ -1958,23 +1958,36 @@
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<span class="nav-btn-content"><span class="spinner"></span> Отправка...</span>';
       
-      setTimeout(() => {
-        // Send to Telegram
-        if (tg) {
-          const data = {
-            deviceType: formData.deviceTypeLabel,
-            brand: formData.brand,
-            model: formData.model,
-            problem: formData.problem,
-            urgency: formData.urgencyLabel,
-            address: formData.address,
-            phone: formData.phone
-          };
+      // Собираем данные В ФОРМАТЕ КОТОРЫЙ ОЖИДАЕТ БОТ!
+      // Бот ожидает ключи: name, phone, device, problem, urgency, address
+      const data = {
+        name: (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user.first_name : 'Клиент',
+        phone: formData.phone,
+        device: formData.deviceTypeLabel + ' ' + formData.brand + ' ' + formData.model,
+        problem: formData.problem,
+        urgency: formData.urgencyLabel,
+        address: formData.address || 'Не указан'
+      };
+      
+      // Отправляем в Telegram (это закроет Mini App автоматически!)
+      if (tg && tg.sendData) {
+        try {
           tg.sendData(JSON.stringify(data));
+          // После sendData() Mini App закроется автоматически
+          // Клиент увидит сообщение от бота в чате
+          return; // Важно! Выходим из функции
+        } catch (e) {
+          console.error('Ошибка отправки:', e);
+          alert('Ошибка отправки. Попробуйте ещё раз.');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span class="nav-btn-content"><span>📤</span> Отправить заявку</span>';
         }
-        
+      } else {
+        // Если открыто НЕ через Telegram (для тестирования)
+        console.log('Данные формы:', data);
+        alert('Тестовый режим!\n\nДанные:\n' + JSON.stringify(data, null, 2));
         showSuccessScreen();
-      }, 1500);
+      }
     }
 
     function showSuccessScreen() {
